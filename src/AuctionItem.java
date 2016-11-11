@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  *
  * @author Steghi
  */
-public class AuctionItem implements Serializable
+public class AuctionItem implements Serializable, AuctionItemIntf
 {
 
     private long id = 0;
@@ -34,7 +34,7 @@ public class AuctionItem implements Serializable
     private Bid highestBid = null;
     private boolean isClosed = false;
     private boolean isExpired = false;
-    private List<AuctionSystemClientIntf> callbacks;
+    private List<AuctionSystemClientIntf> callbacks= new ArrayList<>();
 
     public boolean hasClosed() {
         return isClosed == true;
@@ -108,13 +108,21 @@ public class AuctionItem implements Serializable
     
     }   
 
+    @Override
+    public void registerClient(AuctionSystemClientIntf clientRef) throws RemoteException {
+        if (callbacks ==null || !callbacks.contains(clientRef))
+        {
+            callbacks.add(clientRef);
+        }
+    }
+
 
 
     class CloseTask extends TimerTask 
     {
         public void run() 
         {
-            callbacks = AuctionSystemServer.getBiddersReference();
+            //callbacks = AuctionSystemServer.getBiddersReference();
             for (AuctionSystemClientIntf client : callbacks)
             {
                 try {
