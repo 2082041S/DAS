@@ -47,38 +47,24 @@ public class AuctionSystemImpl implements AuctionSystem
     /*
     Client bids a price against an auction.
     Bid must be bigger than the highest bid (auction.getMinValue())
-    Return the minimum bid price if bid failed, otherwise -1
+    Return the minimum bid price if bid failed, -2 if auction is closed;  -1 if it succeeded
     */
     public long bid(long id, long price,long ownerid) throws RemoteException 
     {
         AuctionItem auction = AuctionSystemServer.getAuctionById(id);
-        if (auction == null || auction.getMinValue() >= price)
+        if (auction == null  || auction.getMinValue() >= price )
             return auction.getMinValue();
         AuctionSystemServer.updateBid(id, price, ownerid);
+        if (auction.hasClosed())
+        {
+            return -2;
+        }
         return -1;
     }
 
     @Override
     public List<String> listAvailableAuctionItems() throws RemoteException 
     {
-//        float currentTime = System.currentTimeMillis() /1000;
-//        for (AuctionItem auction : auctionItems)
-//        {
-//            float secondsRemaining = auction.getCloseTime() - currentTime;
-//            if ( secondsRemaining > 0)
-//                availableItems.add(auction.getId());
-//            else if (abs(secondsRemaining) < EXPIRATION_TIME)
-//            {
-//                closedItems.add(auction);
-//            }
-//            else
-//            {
-//                expiredItems.add(auction);
-//            }
-//        }
-//        
-//        auctionItems.removeAll(closedItems);
-//        auctionItems.removeAll(expiredItems);
         
         Map<Long, AuctionItem> auctions = AuctionSystemServer.getAvailableItems();
         List<String> auction_list = new ArrayList<>();
@@ -97,6 +83,13 @@ public class AuctionSystemImpl implements AuctionSystem
     @Override
     public long getNextOwnerID() throws RemoteException {
         return ownerid++;
+    }
+
+    @Override
+    public AuctionItemIntf GetAuctionByID(long id) throws RemoteException 
+    {
+        Map<Long, AuctionItem> auctions = AuctionSystemServer.getAvailableItems();
+        return auctions.get(id);
     }
     
 }

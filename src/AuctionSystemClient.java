@@ -23,8 +23,10 @@ import java.net.MalformedURLException;	//Import the MalformedURLException class 
 import java.rmi.NotBoundException;	//Import the NotBoundException class so you can catch it
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class AuctionSystemClient extends UnicastRemoteObject implements AuctionSystemClientIntf,Runnable
+public class AuctionSystemClient extends UnicastRemoteObject implements AuctionSystemClientIntf
 {
     private static long ownerid;
     public AuctionSystemClient() throws RemoteException 
@@ -35,6 +37,12 @@ public class AuctionSystemClient extends UnicastRemoteObject implements AuctionS
     
     public static void main(String[] args) 
     { 
+    AuctionSystemClient client = null;
+        try {
+            client = new AuctionSystemClient();
+        } catch (RemoteException ex) {
+            Logger.getLogger(AuctionSystemClient.class.getName()).log(Level.SEVERE, null, ex);
+        }
     String reg_host = "localhost";
     int reg_port = 1099;
 
@@ -52,16 +60,14 @@ public class AuctionSystemClient extends UnicastRemoteObject implements AuctionS
         AuctionSystem a = (AuctionSystem)
                        //Naming.lookup("rmi://localhost/CalculatorService");
                        Naming.lookup("rmi://" + reg_host + ":" + reg_port + "/AuctionService");
-
-        AuctionItemIntf auctionIntf = (AuctionItemIntf) Naming.lookup("rmi://" + reg_host + ":" + reg_port + "/AuctionService");
         
         ownerid = a.getNextOwnerID();
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         String line = null;
-        System.out.println("Please choose one of the following actions: createAuction, bid, listAvailableAuctions");
+        System.out.println("Please choose one of the following actions: createAuction, bid, showAuctions");
         System.out.println("In order to create an auction type in: createAuction <name> <minValue> <closeTime>");
         System.out.println("In order to place a bid type in: bid <auctionID> <value>");
-        System.out.println("In order to check all available auctions type in: listAvailableAuctions");
+        System.out.println("In order to check all available auctions type in: showAuctions");
         System.out.println("If you want to quit type in: quit " );
         while (!(line = br.readLine()).startsWith("quit"))
         {
@@ -77,8 +83,9 @@ public class AuctionSystemClient extends UnicastRemoteObject implements AuctionS
                     if (minValue >=0 && closeTime >= 0)
                     {
                         long id = a.createAuctionItem(name, minValue, closeTime,ownerid);
+                        AuctionItemIntf auction = a.GetAuctionByID(id);
                         System.out.println("You have succesfully created an auction. The ID of the auction is "+ id);
-                        auctionIntf.registerClient(new AuctionSystemClient());
+                        auction.registerClient(client);
                     }
                     else
                     {
@@ -92,8 +99,13 @@ public class AuctionSystemClient extends UnicastRemoteObject implements AuctionS
                     long price = a.bid(auctionID, value, ownerid);
                     if (price == -1)
                     {
-                        System.out.println("You have succesfully made a bid");                        
-                        auctionIntf.registerClient(new AuctionSystemClient());
+                        System.out.println("You have succesfully made a bid");  
+                        AuctionItemIntf auctionIntf =  a.GetAuctionByID(auctionID);
+                        auctionIntf.registerClient(client);
+                    }
+                    else if ( price == -2 )
+                    {
+                       System.out.println("Auction has closed"); 
                     }
                     else
                     {
@@ -101,16 +113,23 @@ public class AuctionSystemClient extends UnicastRemoteObject implements AuctionS
                     }
                     break;
 
-                case "listAvailableItems":
-                    System.out.println("Here are the available auctions:");
+                case "showAuctions":
                     List<String> auctions = a.listAvailableAuctionItems();
-                    for (String auction : auctions)
-                        System.out.println(auction);
+                    if (!auctions.isEmpty())
+                    {
+                        System.out.println("Here are the available auctions:");
 
+                        for (String auction : auctions)
+                            System.out.println(auction);
+                        
+                    }
+                    else
+                    {
+                        System.out.println("There are no available auctions");
+                    }
                     break;
-
                 default:
-
+                    System.out.println("Please choose one of the following actions: createAuction, bid, showAuctions");
             }
         }  
          br.close();
@@ -148,13 +167,6 @@ public class AuctionSystemClient extends UnicastRemoteObject implements AuctionS
             System.out.println("IOException");
             System.out.println(io);
         }
-    }
-
-
-    @Override
-    public void run() 
-    {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override

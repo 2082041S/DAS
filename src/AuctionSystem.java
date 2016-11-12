@@ -27,6 +27,9 @@ public interface AuctionSystem extends java.rmi.Remote
 
     public List<String> listAvailableAuctionItems()
             throws java.rmi.RemoteException;
+    
+    public AuctionItemIntf GetAuctionByID(long id)
+            throws java.rmi.RemoteException;
 
     public long getNextOwnerID()
             throws java.rmi.RemoteException;

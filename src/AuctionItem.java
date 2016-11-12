@@ -1,6 +1,7 @@
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,13 +22,13 @@ import java.util.logging.Logger;
  *
  * @author Steghi
  */
-public class AuctionItem implements Serializable, AuctionItemIntf
+public class AuctionItem extends UnicastRemoteObject implements  AuctionItemIntf
 {
 
     private long id = 0;
     private final String name;
     private long minValue;
-    private final long EXPIRITYTIME = 500;
+    private final long EXPIRITYTIME = 50;
     private final long closeTime;
     private final long ownerid;
     private List<Long> bidders = new ArrayList<>();
@@ -95,6 +96,7 @@ public class AuctionItem implements Serializable, AuctionItemIntf
     }
     
     public AuctionItem(String name, long minValue, long closeTime, long id, long ownerid) 
+            throws java.rmi.RemoteException
     {
         super();
         this.ownerid = ownerid;
@@ -110,6 +112,7 @@ public class AuctionItem implements Serializable, AuctionItemIntf
 
     @Override
     public void registerClient(AuctionSystemClientIntf clientRef) throws RemoteException {
+        System.out.println ("Client Registered");
         if (callbacks ==null || !callbacks.contains(clientRef))
         {
             callbacks.add(clientRef);
@@ -122,11 +125,10 @@ public class AuctionItem implements Serializable, AuctionItemIntf
     {
         public void run() 
         {
-            //callbacks = AuctionSystemServer.getBiddersReference();
             for (AuctionSystemClientIntf client : callbacks)
             {
                 try {
-                    client.callBack("Auction " + id + "of owner: "+ ownerid +" has closed");
+                    client.callBack("Auction " + id + " of owner: "+ ownerid +" has closed");
                     
                     if (highestBid != null)
                     {
@@ -148,8 +150,10 @@ public class AuctionItem implements Serializable, AuctionItemIntf
 
     class ExpiryTask extends TimerTask 
     {
+        @Override
         public void run() 
         {
+            AuctionSystemServer.removeAuction(id);
             isExpired = true;
         }
     }

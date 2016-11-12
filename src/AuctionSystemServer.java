@@ -23,12 +23,11 @@ public class AuctionSystemServer
     static void updateBid(long id, long price, long ownerid) throws RemoteException 
     {
         Bid bid = new Bid(price, ownerid);
-        System.out.println("Bid received");
         AuctionItem auction = auctionItems.get(id);
         auction.addBid(bid);
         auctionItems.put(id, auction);
-        System.out.println(auction.getBidders());
-        System.out.println("OwnerID: "+ auction.getHighestBid().getOwnerid() + "Price: " + auction.getHighestBid().getPrice());
+        System.out.println("Bid received: OwnerID: "+ auction.getHighestBid().getOwnerid() + " Price: " + auction.getHighestBid().getPrice());
+        System.out.println(auction.getBidders());       
     }
 
 
@@ -48,11 +47,12 @@ public class AuctionSystemServer
     {
         return auctionItems.get(id);
     }
-    
-    static void notifyAllBidders(AuctionItem auction)
-    {
-        
+
+    static void removeAuction(long id) {
+        System.out.println("Auction " + id + " expired and as a result has been removed");
+        auctionItems.remove(id);
     }
+    
    //calculatorserver constructor
    public AuctionSystemServer() 
    {
