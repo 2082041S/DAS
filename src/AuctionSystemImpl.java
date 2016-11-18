@@ -27,6 +27,7 @@ public class AuctionSystemImpl implements AuctionSystem
     public long ownerid;
     public Map<Long, AuctionItem> auctions = new HashMap<>(); 
     public final String storageFileLocation = System.getProperty("user.dir") + "\\storage.ser";
+    public final String poundSign = "\u00A3";
     
     public AuctionSystemImpl()
         throws java.rmi.RemoteException 
@@ -82,7 +83,7 @@ public class AuctionSystemImpl implements AuctionSystem
         auctions.put(id, auction);
         
         System.out.println("Bid received from OwnerID "+ auction.getHighestBid().getOwnerid() + " for " + auction.getHighestBid().getPrice() + 
-                "£ for item " + auction.getId() + " with name " + auction.getName());
+                poundSign + " for item " + auction.getId() + " with name " + auction.getName());
         System.out.println("Bidders: " + auction.getBidders());       
     }
 
@@ -94,9 +95,9 @@ public class AuctionSystemImpl implements AuctionSystem
         {
             String openOrClosed = auction.hasClosed()?"CLOSED":"OPEN";
             auction_list.add("Auction " + auction.getId()+
-                    " with name " + auction.getName() +
-                    " and price " + auction.getMinValue() +
-                    "£ " + openOrClosed);
+                    " with name '" + auction.getName() +
+                    "' and price '" + auction.getMinValue() +
+                    poundSign + "' " + openOrClosed);
         }
         return auction_list;
     }
@@ -140,10 +141,10 @@ public class AuctionSystemImpl implements AuctionSystem
                 AuctionItem restoredAuction = new AuctionItem(auction.getName(), auction.getMinValue(), auction.getCloseTime(),auction.getId(), auction.getOwnerid());
                 auctions.put(restoredAuction.getId(), restoredAuction);
                 sb.append("Auction ").append(restoredAuction.getId()).
-                        append(": with name'").append(restoredAuction.getName()).
-                        append(" ' and price '").append(restoredAuction.getMinValue()).
-                        append(" £' and close time '").append(restoredAuction.getCloseTime()).
-                        append(" ' has been restored\n");
+                        append(": with name '").append(restoredAuction.getName()).
+                        append("' and price '").append(restoredAuction.getMinValue()).append(poundSign).
+                        append("' and close time '").append(restoredAuction.getCloseTime()).
+                        append("' has been restored\n");
             }
             
             for (long auctionID : auctions.keySet())
