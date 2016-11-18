@@ -1,5 +1,4 @@
 
-import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
@@ -8,34 +7,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-//package auctionsystem;
-
-/**
- *
- * @author Steghi
- */
 public class AuctionItem extends UnicastRemoteObject implements  AuctionItemIntf
 {
 
     private long id = 0;
     private final String name;
     private long minValue;
-    private final long EXPIRITYTIME = 50;
+    private final long EXPIRITYTIME = 60;
     private final long closeTime;
     private final long ownerid;
     private List<Long> bidders = new ArrayList<>();
     private Bid highestBid = null;
     private boolean isClosed = false;
     private boolean isExpired = false;
-    private List<AuctionSystemClientIntf> callbacks= new ArrayList<>();
+    private Map<Long,ClientIntf> clientsPartakingInTheAuction= new HashMap<>();
 
     public boolean hasClosed() {
         return isClosed == true;
@@ -104,18 +90,18 @@ public class AuctionItem extends UnicastRemoteObject implements  AuctionItemIntf
         this.name = name;
         this.minValue = minValue;
         this.closeTime = closeTime;
-        
         Timer closeTimer = new Timer();
         closeTimer.schedule(new CloseTask(), closeTime *1000); 
     
     }   
 
     @Override
-    public void registerClient(AuctionSystemClientIntf clientRef) throws RemoteException {
-        System.out.println ("Client Registered");
-        if (callbacks ==null || !callbacks.contains(clientRef))
+    public void registerClient(ClientIntf clientRef , long ownerid) throws RemoteException 
+    {
+        //System.out.println ("Client " + ownerid +  " registered");
+        if (clientsPartakingInTheAuction ==null || !clientsPartakingInTheAuction.values().contains(clientRef))
         {
-            callbacks.add(clientRef);
+            clientsPartakingInTheAuction.put(ownerid, clientRef);
         }
     }
 
@@ -125,23 +111,35 @@ public class AuctionItem extends UnicastRemoteObject implements  AuctionItemIntf
     {
         public void run() 
         {
-            for (AuctionSystemClientIntf client : callbacks)
+            List<Long> clientsToRemove = new ArrayList<>();
+            for (Map.Entry<Long, ClientIntf> client : clientsPartakingInTheAuction.entrySet())
             {
+                ClientIntf clientRef = client.getValue();
                 try {
-                    client.callBack("Auction " + id + " of owner: "+ ownerid +" has closed");
+                    clientRef.callBack("Auction " + id + ": " + name + " has closed");
                     
                     if (highestBid != null)
                     {
-                        client.callBack("Winner is " + highestBid.getOwnerid() + " for the price of " + highestBid.getPrice());
+                        clientRef.callBack("Your id is: " + client.getKey());
+                        clientRef.callBack("Client with id " + highestBid.getOwnerid() + 
+                                " has won the auction for the price of " + highestBid.getPrice() + "£");
                     }
                     else
                     {
-                        client.callBack("Nobody bided on this auction");
+                        clientRef.callBack("Nobody bided on this auction");
                     }
-                } catch (RemoteException ex) {
-                    ex.printStackTrace();
+                } catch (RemoteException ex) {    
+                    //Client has disconnected
+                    //clientsToRemove.add(client.getKey());
+                    System.out.println ("Client " + client.getKey() + " is down");
                 }
             }
+            
+//            for (long clientid : clientsToRemove)
+//            {
+//                clientsPartakingInTheAuction.remove(clientid);
+//            }
+            
             isClosed = true;
             Timer expiryTimer = new Timer();
             expiryTimer.schedule(new ExpiryTask(), EXPIRITYTIME * 1000);
@@ -153,7 +151,14 @@ public class AuctionItem extends UnicastRemoteObject implements  AuctionItemIntf
         @Override
         public void run() 
         {
-            AuctionSystemServer.removeAuction(id);
+            try 
+            {
+                Server.removeAuction(id);
+            } 
+            catch (RemoteException ex) 
+            {
+                System.out.println("Failed to remove auction " + id + " which just expired");
+            }
             isExpired = true;
         }
     }

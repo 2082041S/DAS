@@ -4,12 +4,12 @@
  * and open the template in the editor.
  */
 
-
 /**
  *
  * @author Steghi
  */
-public class AuctionResult 
+import java.rmi.*;
+public interface ClientIntf  extends Remote
 {
-    
+   public void callBack(String s) throws java.rmi.RemoteException;
 }
