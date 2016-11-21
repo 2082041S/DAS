@@ -20,6 +20,7 @@ public class RMIPerformance extends Application
     private static Map<Float, Long> countPerMS = new HashMap<>();
     private static AuctionSystem auctionSystem = null;
     private static String method = "";
+    private static long numberOfCalls = 0;
     private static float callClientMethod(String methodCall, long iterations) throws RemoteException
     {
         long startTime = System.currentTimeMillis();
@@ -71,13 +72,13 @@ public class RMIPerformance extends Application
         try 
         {
             method = args[0];
-            long iterations = Long.parseLong(args[1]);
+            numberOfCalls = Long.parseLong(args[1]);
             AuctionSystemImpl ai = new AuctionSystemImpl();
             auctionSystem = (AuctionSystem) UnicastRemoteObject.exportObject(ai, 0);
             Naming.rebind("rmi://localhost:" + "1099" + "/AuctionService", auctionSystem);
             for (int i = 0; i< 100; i++)
             {
-                float msPerCall = callClientMethod(method, iterations );
+                float msPerCall = callClientMethod(method, numberOfCalls );
                 if (countPerMS.containsKey(msPerCall))
                 {
                     long count = countPerMS.get(msPerCall);
@@ -98,6 +99,8 @@ public class RMIPerformance extends Application
         launch(args);        
     }
 
+    // Used for evaluation. I make sure I pass the right argument types
+    @SuppressWarnings("unchecked")
     @Override
     public void start(Stage stage) throws Exception 
     {
@@ -105,7 +108,7 @@ public class RMIPerformance extends Application
         final CategoryAxis xAxis = new CategoryAxis();
         final NumberAxis yAxis = new NumberAxis();
         final BarChart<String,Number> bc = new BarChart<>(xAxis,yAxis);
-        bc.setTitle(method +" calls per milisecond bar chart");
+        bc.setTitle(numberOfCalls + " calls of " + method);
         xAxis.setLabel("Milisecond");       
         yAxis.setLabel(method + " calls");
         
