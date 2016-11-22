@@ -143,7 +143,7 @@ public class Client extends UnicastRemoteObject implements ClientIntf
                     catch (Exception e)
                     {
                         System.out.println("Wrong input. Auction id and bid price must be positive integers.");
-                        System.out.println("Please try again: createAuction <name> <minValue> <closeTime>");
+                        System.out.println("Please try again: bid <auctionID> <value>");
                     }
                     break;
 

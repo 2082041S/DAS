@@ -136,7 +136,7 @@ public class AuctionSystemImpl implements AuctionSystem
         }
         else
         {                    
-            for (AuctionItem auction : getStoredAuctions())
+            for (AuctionItem auction : storedAuctions)
             {        
                 AuctionItem restoredAuction = new AuctionItem(auction.getName(), auction.getMinValue(), auction.getCloseTime(),auction.getId(), auction.getOwnerid());
                 auctions.put(restoredAuction.getId(), restoredAuction);
@@ -180,7 +180,7 @@ public class AuctionSystemImpl implements AuctionSystem
         }
         catch (IOException | ClassNotFoundException ex)
         {
-            System.out.println ("Failed to restore auctions");
+            System.out.println ("Failed to get auctions from storage file");
         }
         return storedAuctions;
     }
