@@ -22,6 +22,7 @@ public class AuctionItem extends UnicastRemoteObject implements  AuctionItemIntf
     private boolean isClosed = false;
     private boolean isExpired = false;
     private Map<Long,ClientIntf> clientsPartakingInTheAuction= new HashMap<>();
+    public final String poundSign = "\u00A3";
 
     public boolean hasClosed() {
         return isClosed == true;
@@ -122,11 +123,11 @@ public class AuctionItem extends UnicastRemoteObject implements  AuctionItemIntf
                     {
                         clientRef.callBack("Your id is: " + client.getKey());
                         clientRef.callBack("Client with id " + highestBid.getOwnerid() + 
-                                " has won the auction for the price of " + highestBid.getPrice() + "£");
+                                " has won the auction for the price of " + highestBid.getPrice() + poundSign);
                     }
                     else
                     {
-                        clientRef.callBack("Nobody bided on this auction");
+                        clientRef.callBack("Price of " + minValue + poundSign+" not met");
                     }
                 } catch (RemoteException ex) {    
                     //Client has disconnected
