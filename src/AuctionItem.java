@@ -1,4 +1,3 @@
-
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
@@ -99,7 +98,7 @@ public class AuctionItem extends UnicastRemoteObject implements  AuctionItemIntf
     @Override
     public void registerClient(ClientIntf clientRef , long ownerid) throws RemoteException 
     {
-        //System.out.println ("Client " + ownerid +  " registered");
+        System.out.println ("Client " + ownerid +  " registered");
         if (clientsPartakingInTheAuction ==null || !clientsPartakingInTheAuction.values().contains(clientRef))
         {
             clientsPartakingInTheAuction.put(ownerid, clientRef);
@@ -131,15 +130,15 @@ public class AuctionItem extends UnicastRemoteObject implements  AuctionItemIntf
                     }
                 } catch (RemoteException ex) {    
                     //Client has disconnected
-                    //clientsToRemove.add(client.getKey());
+                    clientsToRemove.add(client.getKey());
                     System.out.println ("Client " + client.getKey() + " is down");
                 }
             }
             
-//            for (long clientid : clientsToRemove)
-//            {
-//                clientsPartakingInTheAuction.remove(clientid);
-//            }
+            for (long clientid : clientsToRemove)
+            {
+                clientsPartakingInTheAuction.remove(clientid);
+            }
             
             isClosed = true;
             Timer expiryTimer = new Timer();

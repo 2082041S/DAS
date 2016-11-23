@@ -1,10 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-//package auctionsystem;
-
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -17,10 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
-/**
- *
- * @author Steghi
- */
 public class AuctionSystemImpl implements AuctionSystem
 {
     private AtomicLong id = new AtomicLong();
@@ -232,8 +221,7 @@ public class AuctionSystemImpl implements AuctionSystem
         }
         catch (IOException ex)
         {
-            ex.printStackTrace();
-            return ex.getMessage();
+            System.out.println("Storage failed " + ex.getMessage());
         }
         
         return auctionsStoredSB.toString();

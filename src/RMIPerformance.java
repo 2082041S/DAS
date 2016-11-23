@@ -1,11 +1,7 @@
-
-
 import java.util.*;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 import java.text.DecimalFormat;
-import javax.swing.*;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
@@ -24,7 +20,7 @@ public class RMIPerformance extends Application
     private static long numberOfCalls = 0;
     private static long numberOfAverageResults = 100;
     private static float averageMsPerCall = 0;
-	private static String reg_host = "localhost";
+    private static String reg_host = "localhost";
 
     private static float callClientMethod(String methodCall, long iterations) throws RemoteException
     {

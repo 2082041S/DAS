@@ -1,26 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-//package auctionsystem;
-
-/*
-	Code: Calculator client		calculatorClient.java
-	
-
-	Simple client program that remotely calls a set of arithmetic
-	methods available on the remote calculatorimpl object
-
-*/
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.rmi.Naming;			//Import the rmi naming - so you can lookup remote object
-import java.rmi.RemoteException;	//Import the RemoteException class so you can catch it
-import java.net.MalformedURLException;	//Import the MalformedURLException class so you can catch it
-import java.rmi.NotBoundException;	//Import the NotBoundException class so you can catch it
+import java.rmi.Naming;			
+import java.rmi.RemoteException;	
+import java.net.MalformedURLException;	
+import java.rmi.NotBoundException;	
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 import java.util.Timer;
@@ -34,9 +18,10 @@ public class Client extends UnicastRemoteObject implements ClientIntf
     public Client(String reg_host, int reg_port) throws RemoteException 
     {
         super();
-        // Create the reference to the remote object through the rmiregistry	
+        
         try
         {
+        // Create the reference to the remote object through the rmiregistry	
         auctionSystem = (AuctionSystem)
                        Naming.lookup("rmi://" + reg_host + ":" + reg_port + "/AuctionService");
         }
