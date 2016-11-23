@@ -24,9 +24,11 @@ public class RMIPerformance extends Application
     private static long numberOfCalls = 0;
     private static long numberOfAverageResults = 100;
     private static float averageMsPerCall = 0;
+	private static String reg_host = "localhost";
+
     private static float callClientMethod(String methodCall, long iterations) throws RemoteException
     {
-        Client client = new Client("localhost",1099);
+        Client client = new Client(reg_host,1099);
         auctionSystem.createAuctionItem("evaluation",0 , 1000, 0);
         long startTime = System.currentTimeMillis();
         long auctionID = 0;
@@ -77,7 +79,7 @@ public class RMIPerformance extends Application
             numberOfAverageResults = Long.parseLong(args[2]);
             AuctionSystemImpl ai = new AuctionSystemImpl();
             auctionSystem = (AuctionSystem)
-                       Naming.lookup("rmi://" + "localhost" + ":" + "1099" + "/AuctionService");
+                       Naming.lookup("rmi://" + reg_host + ":" + "1099" + "/AuctionService");
             for (int i = 0; i< numberOfAverageResults; i++)
             {
                 float msPerCall = callClientMethod(method, numberOfCalls );
@@ -109,13 +111,13 @@ public class RMIPerformance extends Application
     public void start(Stage stage) throws Exception 
     {
         DecimalFormat df = new DecimalFormat("#.###");
-        stage.setTitle("Throughput Barchart of server for " + method);
+        stage.setTitle("Barchart for " + method);
         final CategoryAxis xAxis = new CategoryAxis();
         final NumberAxis yAxis = new NumberAxis();
         final BarChart<String,Number> bc = new BarChart<>(xAxis,yAxis);
         bc.setTitle(numberOfAverageResults + " calls of " + method + "\n" + 
-                "Throughput: " +df.format(averageMsPerCall)+ " ms/"+method + "\n" +
-                         " i.e " + df.format(1.0/averageMsPerCall) + " calls per milisecond");
+                 df.format(averageMsPerCall)+ " ms/"+method +
+                         " i.e " + df.format(1.0/averageMsPerCall) + " " + method + " calls per milisecond");
         xAxis.setLabel("Milisecond");       
         yAxis.setLabel(method + " calls");
         
