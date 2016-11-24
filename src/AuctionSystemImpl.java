@@ -50,13 +50,13 @@ public class AuctionSystemImpl implements AuctionSystem
         {
             return "Auction has closed";
         }
-        if (auction.getMinValue() >= price)
-        {
-            return "Your bid is too small. You need to bid more than "+auction.getMinValue();
-        }
         synchronized(this)
         {
-        updateBid(id, price, ownerid);
+            if (auction.getMinValue() >= price)
+            {
+                return "Your bid is too small. You need to bid more than "+auction.getMinValue();
+            }
+            updateBid(id, price, ownerid);
         }
 
         return "You have succesfully made a bid";
