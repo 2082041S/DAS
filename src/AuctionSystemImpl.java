@@ -27,13 +27,10 @@ public class AuctionSystemImpl implements AuctionSystem
     @Override
     public long createAuctionItem(String name, long minValue, long closeTime, long ownerid) throws RemoteException 
     {      
-        synchronized(id)
-        {
-            AuctionItem auction = new AuctionItem(name, minValue, closeTime, id.longValue(), ownerid);
-            auctions.put(auction.getId(), auction);
-            id.addAndGet(1);
-            return auction.getId();
-        }
+        AuctionItem auction = new AuctionItem(name, minValue, closeTime, id.longValue(), ownerid);
+        auctions.put(auction.getId(), auction);
+        id.addAndGet(1);
+        return auction.getId();       
     }
 
     @Override
@@ -97,11 +94,8 @@ public class AuctionSystemImpl implements AuctionSystem
     @Override
     public long getNextOwnerID() throws RemoteException 
     {
-        synchronized(this)
-        {
-            ownerid.addAndGet(1);
-            return ownerid.longValue();
-        }
+        ownerid.addAndGet(1);
+        return ownerid.longValue();
     }
 
     @Override
