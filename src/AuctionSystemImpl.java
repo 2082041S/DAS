@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class AuctionSystemImpl implements AuctionSystem
 {
     private AtomicLong id = new AtomicLong();
-    public long ownerid;
+    public AtomicLong ownerid = new AtomicLong();
     public Map<Long, AuctionItem> auctions = new HashMap<>(); 
     public final String storageFileLocation = System.getProperty("user.dir") + "\\storage.ser";
     public final String poundSign = "\u00A3";
@@ -52,7 +52,7 @@ public class AuctionSystemImpl implements AuctionSystem
         }
         if (auction.getMinValue() >= price)
         {
-            return "Your bid is too small. You need to bid more than "+price;
+            return "Your bid is too small. You need to bid more than "+auction.getMinValue();
         }
         synchronized(this)
         {
@@ -93,7 +93,8 @@ public class AuctionSystemImpl implements AuctionSystem
 
     @Override
     public long getNextOwnerID() throws RemoteException {
-        return ownerid++;
+        ownerid.addAndGet(1);
+        return ownerid.longValue();
     }
 
     @Override
@@ -113,7 +114,6 @@ public class AuctionSystemImpl implements AuctionSystem
     @Override
     public String restoreAuctions() throws RemoteException 
     {
-        List<Long> auctionIDList = new ArrayList<>();
         StringBuilder sb = new StringBuilder();       
         sb.append("\n");
         List<AuctionItem> storedAuctions  = getStoredAuctions();
