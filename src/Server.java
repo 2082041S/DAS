@@ -1,5 +1,6 @@
 import java.rmi.Naming;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 
 public class Server
@@ -11,6 +12,8 @@ public class Server
    {
      try 
      {
+        // run rmi registry
+         LocateRegistry.createRegistry(port);
        	AuctionSystemImpl ai = new AuctionSystemImpl();
        	auctionSystem = (AuctionSystem) UnicastRemoteObject.exportObject(ai, 0);
        	Naming.rebind("rmi://localhost:" + port + "/AuctionService", auctionSystem);
