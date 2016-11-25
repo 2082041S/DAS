@@ -94,9 +94,7 @@ public class RMIPerformance extends Application
         } 
         catch (Exception ex) 
         {
-            System.out.println();
-            System.out.println(ex);
-            System.exit(0);
+            System.out.println("RMIPerformance requires the following parameters: <methodName> <numberOfCalls> <numberOfAverages>");
         }    
         launch(args);        
     }

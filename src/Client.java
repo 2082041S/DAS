@@ -105,7 +105,7 @@ public class Client extends UnicastRemoteObject implements ClientIntf
                             System.out.println("The minimum bid price and the close time need to be positive. Please try again.");
                         }                       
                     }
-                    catch (NumberFormatException e)
+                    catch (Exception e)
                     {
                         System.out.println("Wrong input. minimum bid price and close time must be integers.");
                         System.out.println("Please try again: createAuction <name> <minValue> <closeTime>");
